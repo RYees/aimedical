@@ -1,0 +1,272 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  //previewFeatures = ["createMany"]
+}
+
+datasource db {
+  provider = "postgresql"
+  // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
+  // Further reading:
+  // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
+  // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
+  url      = env("DATABASE_URL")
+}
+
+model Example {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model UserTelegram {
+  id     Int @id @default(autoincrement())
+  chatId Int
+  // userId    String
+  // user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Character {
+  id            Int             @id @default(autoincrement())
+  name          String?
+  description   String?
+  behavior      String?
+  image         String?
+  creator       String?
+  count         String?
+  message       String?
+  characterChat CharacterChat[]
+  users         UserCharacter[]
+  User          User?           @relation(fields: [userId], references: [id])
+  userId        String?
+}
+
+// User model to store user information
+// model User {
+//   id              String   @id @default(cuid())
+//   name            String
+//   email           String   @unique
+//   password        String
+// accounts        Account[]
+// sessions        Session[]
+// healthplans     HealthPlan[]
+// healthtracking  HealthTracking[]
+// reminders       Reminder[]
+// characters      UserCharacter[]
+// //userstelegram   UserTelegram[]
+// }
+
+// Necessary for Next auth
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? // @db.Text
+  access_token      String? // @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? // @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id             String           @id @default(cuid())
+  name           String?
+  email          String?          @unique
+  emailVerified  DateTime?
+  password       String? // add password field
+  image          String?
+  type           String?
+  resetPasswordToken   String?
+  resetPasswordExpires BigInt?
+  accounts       Account[]
+  sessions       Session[]
+  character      Character[]
+  healthplans    HealthPlan[]
+  healthtracking HealthTracking[]
+  reminders      Reminder[]
+  characters     UserCharacter[]
+  characterChat  CharacterChat[]
+  //userstelegram   UserTelegram[]
+}
+
+model CharacterChat {
+  id          Int       @id @default(autoincrement())
+  chatid      String?
+  role        String
+  content     String
+  userId      String    @map("user_id")
+  characterId Int       @map("character_id")
+  character   Character @relation(fields: [characterId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
+
+  @@map("character_chat")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([identifier, token])
+}
+
+//AI Companion model to store information about virtual companions
+model UserCharacter {
+  id          Int       @default(autoincrement())
+  balance     Int       @default(0)
+  user        User      @relation(fields: [userId], references: [id])
+  character   Character @relation(fields: [characterId], references: [id])
+  userId      String    @map("user_id")
+  characterId Int       @map("character_id")
+
+  @@id([userId, characterId])
+  @@unique([characterId, userId])
+  @@map("users_character")
+}
+
+//Health Plan model to store personalized health plans for users
+model HealthPlan {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  userId      String
+  // Add other relevant health plan attributes here
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  // Relationship with User model (each Health Plan belongs to a User)
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+// Health Tracking model to store tracked health data for users
+model HealthTracking {
+  id     Int    @id @default(autoincrement())
+  name   String @default("_null")
+  dob    String @default("_null")
+  gender String @default("_null")
+  email  String @default("_null")
+  phone  String @default("_null")
+
+  // vitalSign      String
+  weight        String @default("_null")
+  height        String @default("_null")
+  bloodpressure String @default("_null")
+  pulse         String @default("_null")
+  temperature   String @default("_null")
+  oxysaturation String @default("_null")
+  bmi           String @default("_null")
+
+  steps         String @default("_null")
+  distance      String @default("_null")
+  activeminutes String @default("_null")
+  calories      String @default("_null")
+  exercisetype  String @default("_null")
+  exeheartrate  String @default("_null")
+
+  sleepduration String @default("_null")
+  sleepquality  String @default("_null")
+  sleepstart    String @default("_null")
+  sleepend      String @default("_null")
+  sleepinter    String @default("_null")
+
+  dailycalorie  String @default("_null")
+  //foodcons       String[] //breakfast,lunch,dinner,snacks
+  fbreakfast   String @default("_null")
+  flunch       String @default("_null")
+  fdinner      String @default("_null")
+  fsnacks      String @default("_null")
+  beverage     String @default("_null")
+   //breakfast,lunch,dinner,snacks
+  //macronutrient  String[] //carbohydrate,protiens,fats
+
+  chronichcond String @default("_null")
+  allergies    String @default("_null")
+  symptoms     String @default("_null")
+  hospitalize  String @default("_null")
+
+  mood           String @default("_null")
+  stress         String @default("_null")
+  mentalsymptoms String @default("_null")
+  notes          String @default("_null")
+
+  glucose      String @default("_null")
+  cholesterol  String @default("_null")
+  hemoglobin   String @default("_null")
+  carbohydrate String @default("_null")
+  protiens     String @default("_null")
+  fats         String @default("_null")
+  vitamins     String @default("_null")
+  minerals     String @default("_null")
+  ecg          String @default("_null")
+
+  goals       String @default("_null")
+
+  bloodtype   String @default("_null")
+  famimedical String @default("_null")
+  vaccrecord  String @default("_null")
+  //healthcare     String[]
+  lifeassess  String @default("_null")
+
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  // Relationship with User model (each Health Tracking entry belongs to a User)
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+// Reminder model to store medication reminders and appointments
+model Reminder {
+  id           Int      @id @default(autoincrement())
+  userId       String
+  fullname     String
+  medicinename String
+  dosage       String
+  days         String
+  description  String
+  age          Int
+  phoneNumber  String
+  type         String // "medication" or "appointment"
+  timeArray    String[]
+  opted        Boolean
+  startDate    String
+  endDate      String
+  // Add other relevant reminder attributes here
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  // Relationship with User model (each Reminder belongs to a User)
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+// Message model to store users twilio send notifications
+model NotificationMessage {
+  id        Int      @id @default(autoincrement())
+  messageId String
+  smsId     String
+  accountId String
+  serviceId String
+  From      String
+  To        String
+  Body      String
+  // Add other relevant reminder attributes here
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  // Relationship with User model (each Reminder belongs to a User)
+}

@@ -1,0 +1,42 @@
+ <svg
+    xmlns="http://www.w3.org/2000/svg"
+    version="1.1"
+    viewBox="0 0 800 800"
+    width="1.5em"
+    height="1.5em"
+    style={{ overflow: "visible" }}
+    role="presentation"
+    className="logo relative block text-[60px] md:text-[85px] lg:text-[100px] xl:text-[116px]"
+>
+    <defs>
+    <linearGradient
+        x1="50%"
+        y1="0%"
+        x2="50%"
+        y2="100%"
+        id="lllove-grad"
+    >
+        <stop
+        stop-color="hsl(37, 99%, 67%)"
+        stop-opacity="1"
+        offset="0%"
+        ></stop>
+        <stop
+        stop-color="hsl(316, 73%, 52%)"
+        stop-opacity="1"
+        offset="100%"
+        ></stop>
+    </linearGradient>
+    </defs>
+    <g
+    fill="url(#lllove-grad)"
+    id="heart"
+    transform="matrix(1,0,0,1,0,-10)"
+    >
+    <path
+        d="M393.0055915459052 244.79858249050747C573.0503821739783 103.51608089633757 629.4041748046875 689.4615580952251 390.20977783203125 379.7203185608337 142.6237922081582 657.293665319056 205.97063579425935 104.91468362874917 393.0055915459052 244.79858249050747Z"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    ></path>
+    </g>
+</svg>
